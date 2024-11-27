@@ -1,0 +1,55 @@
+import requests
+from tkinter import*
+from tkinter import  messagebox
+from PIL import Image,ImageTk
+BASE_URL = 'https://pokeapi.co/api/v2/'
+def get_poke_info(name):
+    url = f'{BASE_URL}pokemon/{name.lower()}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        messagebox.showerror("Error", f"Failed to get data (status code: {response.status_code})")
+        return None
+def search_pokemon():
+    name = name_entry.get()
+    if not name:
+        messagebox.showwarning("Input Error", "Please enter a Pokémon name!")
+        return
+    pokemon_info = get_poke_info(name)
+    if pokemon_info:
+        name_label['text'] = f"Name: {pokemon_info['name'].capitalize()}"
+        id_label['text'] = f"ID: {pokemon_info['id']}"
+        height_label['text'] = f"Height: {pokemon_info['height']}"
+        weight_label['text'] = f"Weight: {pokemon_info['weight']}"
+        base_exp_label['text'] = f"Base Experience: {pokemon_info['base_experience']}"
+        moves_list.delete(0, END)
+        moves = [move["move"]["name"] for move in pokemon_info["moves"]]
+        for move in moves:
+            moves_list.insert(END, move)
+windows = Tk()
+windows.title("Ali's Gui")
+icon_image = Image.open("1.jpg") 
+icon = ImageTk.PhotoImage(icon_image)
+windows.iconphoto(True, icon)
+windows.geometry("1920x1080")
+windows.config(background='#000000')
+Label(windows, text="Enter Pokemon Name:", font=("Arial", 12,'bold'),fg='green').pack(pady=10)
+name_entry = Entry(windows, font=("Arial", 12,'bold'),fg='green')
+name_entry.pack(pady=5)
+search_button =Button(windows, text="Search", command=search_pokemon,fg='green',font='bold')
+search_button.pack(pady=10)
+name_label = Label(windows, text="Name:", font=("Arial", 12,'bold'),fg='green')
+name_label.pack(pady=5)
+id_label = Label(windows, text="ID:", font=("Arial", 12,'bold'),fg='green')
+id_label.pack(pady=5)
+height_label = Label(windows, text="Height:", font=("Arial", 12,'bold'),fg='green')
+height_label.pack(pady=5)
+weight_label = Label(windows, text="Weight:", font=("Arial", 12,'bold'),fg='green')
+weight_label.pack(pady=5)
+base_exp_label =Label(windows, text="Base Experience:", font=("Arial", 12,'bold'),fg='green')
+base_exp_label.pack(pady=5)
+Label(windows, text="Moves:", font=("Arial", 12,'bold'),fg='green').pack(pady=10)
+moves_list = Listbox(windows,font='bold',fg='green', height=15, width=50)
+moves_list.pack(padx=10,pady=10)
+windows.mainloop()
